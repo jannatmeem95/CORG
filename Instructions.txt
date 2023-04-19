@@ -1,0 +1,58 @@
+The base code is taken from the corresponding paper (https://arxiv.org/abs/2109.12595) "MultiDoc2Dial: Modeling Dialogues Grounded in Multiple Documents" (EMNLP 2021) by Song Feng *, Siva Sankalp Patel*, Wan Hui and Sachindra Joshi.
+
+
+## Installation
+
+Please refer to "conda_env.yml" for creating a virtual environment.
+
+"conda env create -f conda_env.yml"
+
+Our scripts require to set the following environment variables,
+- `HF_HOME`- for caching downloads from Huggingface locally.
+- `CHECKPOINTS` for saving the checkpoints. You can also manually change $CHECKPOINTS in the "sh" files below.
+
+Alongside this, please also install the following libraries:
+"pip3 install git+https://github.com/boudinfl/pke.git"
+"pip3 install spacy==2.1.0"
+"pip3 install numpy==1.23.5"
+"python3 -m spacy download en_web_sm"
+"pip3 install neuralcoref"
+
+## Data
+
+Please run the commands to download data. It will download the document and dialogue data into folder  `data/multidoc2dial`.
+
+"cd scripts
+./run_download.sh"
+
+## Processing Data
+To process data and create history modeled formats please run either: 
+"./run_data_preprocessing.sh structure generation nohm" For no history Modeling (using full conversational context)
+"./run_data_preprocessing.sh structure generation kp" For keyphrase extraction history Modeling
+"./run_data_preprocessing.sh structure generation qs" For turn selector history Modeling
+"./run_data_preprocessing.sh structure generation coref" For coreference resolution history Modeling
+
+
+
+## Run Baselines
+To recreate our baseline results (DPR + BART) please run:
+"python3 run_dpr_baseline.py"
+"python3 run_bart_baseline.py"
+
+## Fine-tuning RAG model
+please run:
+"./run_converted_modelcard.sh all structure"
+
+To create index please run:
+"./run_kb_index.sh all structure"
+
+To run training:
+"./run finetune_rag_dialdoc.sh all structure original generation"
+
+
+## Evaluations
+To test different history models just rerun "./run_data_preprocessing.sh" with $hm parameters, no need to train the model again and again. Training should be done only with "nohm" (no hisotry model)
+
+Please run:
+"./run_eval_rag_re.sh all structure original generation test"
+"./run_eval_rag_e2e.sh all structure original generation test"
